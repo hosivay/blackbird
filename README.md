@@ -1,16 +1,6 @@
-# blackbird
+# **<span style="font-size:45px;">BlackBird</span>** <br/>
+ 
+ <img src="https://s8.uupload.ir/files/20240220_200243_8s0.jpg" width="300"> 
+A local network messenger <br/>   
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ # <em><span style="font-size:10px;">Version : 0.1 Pre-alpha </span><em/><br/>
