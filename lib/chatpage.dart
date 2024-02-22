@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatefulWidget {
   final String remoteIP;
+  final String name;
 
-  ChatScreen({required this.remoteIP});
+  ChatScreen({required this.remoteIP, required this.name});
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -68,11 +70,35 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  void _showInfoDialog(BuildContext context) { 
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Chat Information'),
+          content: SizedBox(
+            height: MediaQuery.sizeOf(context).height / 4,
+            child: Text("Name : ${widget.name} \nip Address : ${widget.remoteIP}")
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+               
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat with ${widget.remoteIP}'),
+        title: Text('Chat with ${widget.name}'),
+        actions: [IconButton(onPressed: (){_showInfoDialog(context);}, icon: const Icon(CupertinoIcons.info))],
       ),
       body: Column(
         children: <Widget>[
@@ -113,7 +139,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.send),
+                  icon: const Icon(CupertinoIcons.paperplane_fill),
                   onPressed: _sendMessage,
                 ),
               ],

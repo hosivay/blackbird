@@ -1,11 +1,17 @@
 import 'dart:io';
 
 import 'package:blackbird/chatpage.dart';
+import 'package:blackbird/database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_side_menu/flutter_side_menu.dart';
+import 'package:flutter_side_menu/flutter_side_menu.dart'; 
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+
+  // ignore: unused_local_variable
+  var box = await Hive.openBox('myBox');
   runApp(const MyApp());
 }
 
@@ -30,19 +36,20 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: isMobileMode(context: context)
           ? const ChatListScreen()
-          : const test(),
+          : const desktopHome(),
     );
   }
 }
 
-class test extends StatefulWidget {
-  const test({Key? key}) : super(key: key);
+// ignore: camel_case_types
+class desktopHome extends StatefulWidget {
+  const desktopHome({Key? key}) : super(key: key);
 
   @override
-  State<test> createState() => _testState();
+  State<desktopHome> createState() => _desktopHomeState();
 }
 
-class _testState extends State<test> {
+class _desktopHomeState extends State<desktopHome> {
   final _controller = SideMenuController();
   int _currentIndex = 0;
   String _localIP = '';
@@ -136,6 +143,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
+  var chats = MyStorage().ReadData(key: "chats");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,14 +153,55 @@ class _ChatListScreenState extends State<ChatListScreen> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
         ),
       ),
-      body: isMobileMode(context: context)
-          ? Center(
-              child: Text(
-              "Your IP : $_localIP",
-              style: const TextStyle(color: Colors.black),
-            ))
-          : const Center(
-              child: Text('List of chat participants'),
+      body: chats == null
+          ? isMobileMode(context: context)
+              ? Center(
+                  child: Text(
+                  "Your IP : $_localIP",
+                  style: const TextStyle(color: Colors.black),
+                ))
+              : const Center(
+                  child: Text('List of chat participants'),
+                )
+          : ListView.builder(
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                return Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        chats[index]["name"]!,
+                      ),
+                      subtitle: Text(
+                        chats[index]["ip"]!,
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+                      leading: const Icon(Icons.computer),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatScreen(
+                                remoteIP: chats[index]["ip"]!,
+                                name: chats[index]["name"]!),
+                          ),
+                        );
+                      },
+                      trailing: IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            CupertinoIcons.delete,
+                            color: Colors.red.withOpacity(0.6),
+                          )),
+                    ),
+                    const Divider(
+                      endIndent: 55,
+                      indent: 55,
+                      thickness: 0.6,
+                    )
+                  ],
+                );
+              },
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -169,26 +218,48 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   void _showIPDialog(BuildContext context) {
+    final _namecontroller = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Enter Remote IP Address'),
-          content: TextField(
-            onChanged: (value) {
-              _remoteIP = value;
-            },
-            decoration: const InputDecoration(hintText: 'IP Address'),
+          content: SizedBox(
+            height: MediaQuery.sizeOf(context).height / 4,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _namecontroller,
+                    decoration: const InputDecoration(hintText: 'Name'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    onChanged: (value) {
+                      _remoteIP = value;
+                    },
+                    decoration: const InputDecoration(hintText: 'IP Address'),
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                setState(() {});
                 if (_remoteIP != null && _remoteIP!.isNotEmpty) {
+                  MyStorage()
+                      .addChat(name: _namecontroller.text, ip: _remoteIP!);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ChatScreen(remoteIP: _remoteIP!),
+                      builder: (context) => ChatScreen(
+                          remoteIP: _remoteIP!, name: _namecontroller.text),
                     ),
                   );
                 }
@@ -201,6 +272,3 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 }
-
-
-//102.90.127.162
