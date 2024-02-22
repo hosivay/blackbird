@@ -1,0 +1,171 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+
+class ChatScreen extends StatefulWidget {
+  final String remoteIP;
+
+  ChatScreen({required this.remoteIP});
+
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _controller = TextEditingController();
+  final List<String> _messages = [];
+  RawDatagramSocket? _socket;
+  String _localIP = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getLocalIP();
+    _initSocket();
+  }
+
+  Future<void> _getLocalIP() async {
+    for (var interface in await NetworkInterface.list()) {
+      for (var addr in interface.addresses) {
+        if (addr.type == InternetAddressType.IPv4) {
+          setState(() {
+            _localIP = addr.address;
+          });
+          return;
+        }
+      }
+    }
+  }
+
+  Future<void> _initSocket() async {
+    try {
+      _socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 12345);
+      _socket!.listen((RawSocketEvent event) {
+        if (event == RawSocketEvent.read) {
+          Datagram? dg = _socket!.receive();
+          if (dg != null) {
+            setState(() {
+              _messages.add(String.fromCharCodes(dg.data).trim());
+            });
+          }
+        }
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  void _sendMessage() {
+    if (_controller.text.isNotEmpty && _socket != null) {
+      String message = '$_localIP: ${_controller.text}';
+      _socket!
+          .send(utf8.encode(message), InternetAddress(widget.remoteIP), 12345);
+      setState(() {
+        _messages.add(message);
+      });
+      _controller.clear();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat with ${widget.remoteIP}'),
+      ),
+      body: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text('Your Local IP: $_localIP'),
+          ),
+          Expanded(
+            child: StreamBuilder(
+              stream: _streamMessages(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return ListView.builder(
+                  itemCount: _messages.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return ListTile(
+                      title: Bubble(
+                        message: _messages[index],
+                        isMe: _messages[index].startsWith(_localIP), 
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter your message...',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Stream<List<String>> _streamMessages() async* {
+    while (true) {
+      yield _messages;
+      await Future.delayed(const Duration(seconds: 1));
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _socket?.close();
+  }
+}
+
+class Bubble extends StatelessWidget {
+  final String message;
+  final bool isMe; 
+  
+
+  const Bubble({required this.message, required this.isMe, });
+
+  @override
+  Widget build(BuildContext context) {
+    double radiusbubble = 20;
+    return Align(
+      alignment: isMe == false ? Alignment.centerLeft : Alignment.centerRight,
+      child: Container(
+        margin: const EdgeInsets.all(6),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.blue : Colors.green,
+          borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(isMe == false? 0 : radiusbubble),
+              bottomRight: Radius.circular(isMe== false ? radiusbubble : 0),
+              topLeft:   Radius.circular(radiusbubble),
+              topRight:   Radius.circular(radiusbubble)),
+        ),
+        child: Text(
+          message.split(':').sublist(1).join(':').trim(), 
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+}
