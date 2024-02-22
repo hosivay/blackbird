@@ -18,14 +18,16 @@ class MyStorage {
   }
 
 
-// delete(){
-//     List chatsnew = _chats;
-//       MyStorage().deleteHive(key: "chats");
-//       MyStorage().WriteData(key: "chats" ,value: chatsnew);
-// }
+deletechat(index){
+   List _chats = MyStorage().ReadData(key: "chats");
+   _chats.removeAt(index);
+    List chatsnew = _chats;
+      MyStorage().deleteHive(key: "chats");
+      MyStorage().WriteData(key: "chats" ,value: chatsnew);
+}
 
   addChat({required String name, required String ip}) {
-    if (MyStorage().ReadData(key: "chats") == null) {
+    if (MyStorage().ReadData(key: "chats") == null ) {
       MyStorage().WriteData(key: "chats", value: [
         {
           "name": name,
@@ -40,6 +42,7 @@ class MyStorage {
           "ip": ip,
         },
       );
+      MyStorage().WriteData(key: "chats", value: _chats);
     
     }
   }
