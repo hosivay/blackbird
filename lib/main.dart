@@ -1,9 +1,10 @@
-import 'package:blackbird/Screens/ChatList.dart';
+import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:blackbird/Screens/ChatList/ChatList.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'Screens/DesktopOnly/DesktopPage.dart';
-import 'SettingsFiles/Responsive.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'SettingsFiles/Responsive.dart'; 
+
 void main() async {
   await Hive.initFlutter();
 
@@ -12,22 +13,26 @@ void main() async {
   runApp(const MyApp());
 }
 
-
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BlackBird',
-      theme: FlexThemeData.light(scheme: FlexScheme.shark,useMaterial3: true), 
-      darkTheme: FlexThemeData.dark(scheme: FlexScheme.shark,useMaterial3: true), 
-      themeMode: ThemeMode.system, 
-      debugShowCheckedModeBanner: false,
-      home: isMobileMode(context: context)
-          ? const ChatListScreen()
-          : const desktopHome(),
+    final isPlatformDark =
+        // ignore: deprecated_member_use
+        WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+    final initTheme = isPlatformDark ? darkTheme : lightTheme;
+    return ThemeProvider(
+      initTheme: initTheme,
+      builder: (_, myTheme) => MaterialApp(
+        title: 'BlackBird',
+         theme: myTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        home: isMobileMode(context: context)
+            ? const ChatListScreen()
+            : const desktopHome(),
+      ),
     );
   }
 }

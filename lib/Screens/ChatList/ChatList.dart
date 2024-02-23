@@ -1,13 +1,12 @@
-import 'dart:io';
-import 'package:blackbird/Screens/chatpage.dart';
+import 'package:blackbird/Screens/ChatPage/chatpage.dart';
 import 'package:blackbird/SettingsFiles/Responsive.dart';
 import 'package:blackbird/SettingsFiles/database.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
-
-import '../SettingsFiles/Version.dart';
-import '../main.dart';
+import 'package:flutter/material.dart'; 
+// ignore: depend_on_referenced_packages
+import 'package:network_info_plus/network_info_plus.dart'; 
+import 'Widgets/deletepanel.dart';
+import 'Widgets/drawer.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -28,16 +27,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   Future<void> _getLocalIP() async {
-    for (var interface in await NetworkInterface.list()) {
-      for (var addr in interface.addresses) {
-        if (addr.type == InternetAddressType.IPv4) {
-          setState(() {
-            _localIP = addr.address;
-          });
-          return;
-        }
-      }
-    }
+    final info = NetworkInfo();
+    final wifiIP = await info.getWifiIP();
+    print(wifiIP);
+
+    setState(() {
+      _localIP = wifiIP!;
+    });
+    return;
   }
 
   List chats = MyStorage().ReadData(key: "chats") ?? [];
@@ -52,66 +49,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       ),
 
       drawer: isMobileMode(context: context)
-          ? Drawer(
-              child: ListView(
-                children: [
-                  DrawerHeader(
-                    padding: const EdgeInsets.all(1),
-                    decoration: const BoxDecoration(
-                      color: Colors.black,
-                    ), //BoxDecoration
-                    child: UserAccountsDrawerHeader(
-                      decoration: const BoxDecoration(color: Colors.black),
-                      accountName: const Text(
-                        "BlackBird.",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 17),
-                      ),
-                      accountEmail: const Text("Developer : Hosivay"),
-
-                      currentAccountPictureSize: const Size.square(60),
-
-                      currentAccountPicture: CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Image.asset(
-                          "lib/assets/blackbirdlogo.png",
-                          width: 50,
-                          height: 50,
-                          color: Colors.grey.shade900,
-                        ), //Text
-                      ), //circleAvatar
-                    ), //UserAccountDrawerHeader
-                  ), //DrawerHeader
-                  ListTile(
-                    leading: const Icon(CupertinoIcons.device_desktop),
-                    title: Text("Your IP : $_localIP"),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(CupertinoIcons.refresh),
-                    title: const Text("Refresh"),
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MyApp()),
-                      );
-                    },
-                  ),
-                  SizedBox(
-                    height: MediaQuery.sizeOf(context).height / 1.9,
-                  ),
-                  ListTile(
-                    leading: const Icon(CupertinoIcons.info_circle),
-                    title: const Text("Version : $version"),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              ),
-            )
+          ? drawerChatList(context,_localIP)
           : null,
       // ignore: unnecessary_null_comparison
       body: chats == null || chats.isEmpty
@@ -119,14 +57,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ? Center(
                   child: Text(
                   "Your IP : $_localIP",
-                 
                 ))
               : const Center(
                   child: Text('List of chat participants'),
                 )
           : ListView.builder(
               itemCount: chats.length,
-               
               itemBuilder: (context, index) {
                 return Column(
                   children: [
@@ -178,7 +114,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
         },
         backgroundColor: Theme.of(context).textTheme.bodyLarge!.color,
         foregroundColor: Theme.of(context).scaffoldBackgroundColor,
-        child:   Icon(
+        child: Icon(
           Icons.add,
           color: Theme.of(context).scaffoldBackgroundColor,
         ),
@@ -186,6 +122,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
+  
   void _showIPDialog(BuildContext context) {
     final _namecontroller = TextEditingController();
     showDialog(
@@ -242,40 +179,3 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 }
 
-class deleteSlide extends StatefulWidget {
-  const deleteSlide({super.key, required this.child, required this.indexMap});
-  final Widget child;
-  final int indexMap;
-  @override
-  State<deleteSlide> createState() => _deleteSlideState();
-}
-
-class _deleteSlideState extends State<deleteSlide> {
-  @override
-  Widget build(BuildContext context) {
-    return Slidable(
-      closeOnScroll: true,
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        extentRatio: 0.3,
-        children: [
-          SlidableAction(
-            onPressed: (context) async {
-              MyStorage().deletechat(widget.indexMap);
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const MyApp()),
-              );
-            },
-            backgroundColor: const Color(0xFFFE4A49),
-            foregroundColor: Colors.white,
-            icon: CupertinoIcons.delete,
-            label: "Delete",
-            autoClose: true,
-          ),
-        ],
-      ),
-      child: widget.child,
-    );
-  }
-}

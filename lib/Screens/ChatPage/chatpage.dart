@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:blackbird/Screens/ChatPage/Widgets/Bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+// ignore: depend_on_referenced_packages
+import 'package:network_info_plus/network_info_plus.dart';
 
 class ChatScreen extends StatefulWidget {
   final String remoteIP;
@@ -29,15 +33,35 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _getLocalIP() async {
-    for (var interface in await NetworkInterface.list()) {
-      for (var addr in interface.addresses) {
-        if (addr.type == InternetAddressType.IPv4) {
-          setState(() {
-            _localIP = addr.address;
-          });
-          return;
-        }
+    final info = NetworkInfo();
+    final wifiIP = await info.getWifiIP();
+    print(wifiIP);
+
+    setState(() {
+      _localIP = wifiIP!;
+    });
+    return;
+  }
+
+  void _sendMessage() {
+    try {
+      if (_controller.text.isNotEmpty && _socket != null) {
+        String message = '$_localIP: ${_controller.text}';
+        List<int> encodedMessage =
+            utf8.encode(message); 
+        _socket!.send(
+          encodedMessage,
+          InternetAddress(widget.remoteIP, type: InternetAddressType.IPv4),
+          12345,
+        );
+
+        setState(() {
+          _messages.add(message);
+        });
+        _controller.clear();
       }
+    } catch (e) {
+      print("error : $e");
     }
   }
 
@@ -48,34 +72,15 @@ class _ChatScreenState extends State<ChatScreen> {
         if (event == RawSocketEvent.read) {
           Datagram? dg = _socket!.receive();
           if (dg != null) {
+            String decodedMessage = utf8.decode(dg.data);
             setState(() {
-              _messages.add(String.fromCharCodes(dg.data).trim());
+              _messages.add(decodedMessage);
             });
           }
         }
       });
     } catch (e) {
       print('Error: $e');
-    }
-  }
-
-  void _sendMessage() {
-    try{
-      if (_controller.text.isNotEmpty && _socket != null) {
-      String message = '$_localIP: ${_controller.text}';
-      _socket!.send(
-        message.codeUnits,
-        InternetAddress(widget.remoteIP, type: InternetAddressType.IPv4),
-        12345,
-      );
-
-      setState(() {
-        _messages.add(message);
-      });
-      _controller.clear();
-    }
-    }catch(e){
-      print("error : $e");
     }
   }
 
@@ -142,8 +147,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 itemCount: _messages.length,
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
-                    title: 
-                     Bubble(
+                    title: Bubble(
                       message: _messages[index],
                       isMe: _messages[index].startsWith(_localIP),
                     ),
@@ -195,39 +199,5 @@ class _ChatScreenState extends State<ChatScreen> {
   void dispose() {
     super.dispose();
     _socket?.close();
-  }
-}
-
-class Bubble extends StatelessWidget {
-  final String message;
-  final bool isMe;
-
-  const Bubble({
-    required this.message,
-    required this.isMe,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    double radiusbubble = 20;
-    return Align(
-      alignment: isMe == false ? Alignment.centerLeft : Alignment.centerRight,
-      child: Container(
-        margin: const EdgeInsets.all(6),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isMe ? Colors.blue : Colors.green,
-          borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(isMe == false ? 0 : radiusbubble),
-              bottomRight: Radius.circular(isMe == false ? radiusbubble : 0),
-              topLeft: Radius.circular(radiusbubble),
-              topRight: Radius.circular(radiusbubble)),
-        ),
-        child: Text(
-          message.split(':').sublist(1).join(':').trim(),
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-    );
   }
 }
