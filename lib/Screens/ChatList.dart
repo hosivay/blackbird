@@ -40,7 +40,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
-  List chats = MyStorage().ReadData(key: "chats");
+  List chats = MyStorage().ReadData(key: "chats") ?? [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,13 +119,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ? Center(
                   child: Text(
                   "Your IP : $_localIP",
-                  style: const TextStyle(color: Colors.black),
+                 
                 ))
               : const Center(
                   child: Text('List of chat participants'),
                 )
           : ListView.builder(
               itemCount: chats.length,
+               
               itemBuilder: (context, index) {
                 return Column(
                   children: [
@@ -175,11 +176,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
         onPressed: () {
           _showIPDialog(context);
         },
-        backgroundColor: Colors.black.withOpacity(0.7),
-        foregroundColor: Colors.white,
-        child: const Icon(
+        backgroundColor: Theme.of(context).textTheme.bodyLarge!.color,
+        foregroundColor: Theme.of(context).scaffoldBackgroundColor,
+        child:   Icon(
           Icons.add,
-          color: Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
         ),
       ),
     );

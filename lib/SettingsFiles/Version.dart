@@ -1,4 +1,4 @@
 
 
 
-const String version = "0.2 pre alpha";
+const String version = "0.3 pre alpha";

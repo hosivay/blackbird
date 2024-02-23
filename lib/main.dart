@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'Screens/DesktopOnly/DesktopPage.dart';
 import 'SettingsFiles/Responsive.dart';
-
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 void main() async {
   await Hive.initFlutter();
 
@@ -21,9 +21,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BlackBird',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      darkTheme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      themeMode: ThemeMode.dark,
+      theme: FlexThemeData.light(scheme: FlexScheme.shark,useMaterial3: true), 
+      darkTheme: FlexThemeData.dark(scheme: FlexScheme.shark,useMaterial3: true), 
+      themeMode: ThemeMode.system, 
       debugShowCheckedModeBanner: false,
       home: isMobileMode(context: context)
           ? const ChatListScreen()
