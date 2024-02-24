@@ -1,4 +1,5 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
+import 'package:blackbird/SettingsFiles/Update.dart';
 import 'package:blackbird/SettingsFiles/Version.dart';
 import 'package:blackbird/main.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
@@ -60,8 +61,33 @@ Widget drawerChatList(BuildContext context, String localip) {
                 );
               },
             ),
+           
+             FutureBuilder(
+              future: getLatestRelease(),
+              builder: (context, AsyncSnapshot<String?> snapshot) {
+                if (snapshot.hasData) {
+                  print("New : ${snapshot.data!} / Old : $version");
+                  return ListTile(
+                    leading: const Icon(CupertinoIcons.cloud_download),
+                    title: snapshot.data!.compareTo(version) > 0
+                        ? Text("New version released! ${snapshot.data!}")
+                        : const Text("Your version is up to date"),
+                    onTap: () {
+                     if(snapshot.data!.compareTo(version) > 0){
+                      launchURL();
+                     }
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  return const Text("");
+                } else {
+                  return const Text("");
+                }
+              },
+            ),
+
             SizedBox(
-              height: MediaQuery.sizeOf(context).height / 1.9,
+              height: MediaQuery.sizeOf(context).height / 2.1,
             ),
             ListTile(
               leading: const Icon(CupertinoIcons.info_circle),
@@ -80,17 +106,16 @@ Widget drawerChatList(BuildContext context, String localip) {
               builder: (_, switcher, theme) {
                 return IconButton(
                   onPressed: () {
-                  
-                    
                     switcher.changeTheme(
                       theme: theme.brightness == Brightness.light
                           ? darkTheme
                           : lightTheme,
                     );
-                   
                   },
                   icon: Icon(
-                    theme.brightness == Brightness.light ? Icons.brightness_3 : Icons.sunny,
+                    theme.brightness == Brightness.light
+                        ? Icons.brightness_3
+                        : Icons.sunny,
                     size: 25,
                     color: Colors.white,
                   ),

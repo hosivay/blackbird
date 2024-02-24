@@ -1,10 +1,10 @@
 import 'package:blackbird/Screens/ChatPage/chatpage.dart';
-import 'package:blackbird/SettingsFiles/Responsive.dart';
+import 'package:blackbird/SettingsFiles/Responsive.dart'; 
 import 'package:blackbird/SettingsFiles/database.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart'; 
+import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
-import 'package:network_info_plus/network_info_plus.dart'; 
+import 'package:network_info_plus/network_info_plus.dart';
 import 'Widgets/deletepanel.dart';
 import 'Widgets/drawer.dart';
 
@@ -29,7 +29,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Future<void> _getLocalIP() async {
     final info = NetworkInfo();
     final wifiIP = await info.getWifiIP();
-    print(wifiIP);
 
     setState(() {
       _localIP = wifiIP!;
@@ -49,7 +48,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       ),
 
       drawer: isMobileMode(context: context)
-          ? drawerChatList(context,_localIP)
+          ? drawerChatList(context, _localIP)
           : null,
       // ignore: unnecessary_null_comparison
       body: chats == null || chats.isEmpty
@@ -122,7 +121,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
-  
   void _showIPDialog(BuildContext context) {
     final _namecontroller = TextEditingController();
     showDialog(
@@ -147,7 +145,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
                     onChanged: (value) {
                       _remoteIP = value;
                     },
-                    decoration: const InputDecoration(hintText: 'IP Address'),
+                    decoration: const InputDecoration(
+                      hintText: 'IP Address',
+                    ),
+                    keyboardType: TextInputType.number,
                   ),
                 ),
               ],
@@ -178,4 +179,3 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 }
-

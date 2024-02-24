@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
         // ignore: deprecated_member_use
         WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
     final initTheme = isPlatformDark ? darkTheme : lightTheme;
+    
     return ThemeProvider(
       initTheme: initTheme,
       builder: (_, myTheme) => MaterialApp(
