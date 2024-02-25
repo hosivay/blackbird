@@ -1,9 +1,10 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'package:blackbird/Screens/ChatList/ChatList.dart';
+import 'package:blackbird/Screens/ChatList/ChatList.dart'; 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/material.dart';
 import 'Screens/DesktopOnly/DesktopPage.dart';
 import 'SettingsFiles/Responsive.dart'; 
+import 'package:get/get.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -25,12 +26,13 @@ class MyApp extends StatelessWidget {
     
     return ThemeProvider(
       initTheme: initTheme,
-      builder: (_, myTheme) => MaterialApp(
+      builder: (_, myTheme) => GetMaterialApp(
         title: 'BlackBird',
          theme: myTheme,
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
-        home: isMobileMode(context: context)
+        home: 
+        isMobileMode(context: context)
             ? const ChatListScreen()
             : const desktopHome(),
       ),

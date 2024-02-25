@@ -1,7 +1,6 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
 import 'package:blackbird/SettingsFiles/Update.dart';
-import 'package:blackbird/SettingsFiles/Version.dart';
-import 'package:blackbird/main.dart';
+import 'package:blackbird/SettingsFiles/Version.dart'; 
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,22 +50,12 @@ Widget drawerChatList(BuildContext context, String localip) {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: const Icon(CupertinoIcons.refresh),
-              title: const Text("Refresh"),
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyApp()),
-                );
-              },
-            ),
-           
+             
              FutureBuilder(
               future: getLatestRelease(),
               builder: (context, AsyncSnapshot<String?> snapshot) {
                 if (snapshot.hasData) {
-                  print("New : ${snapshot.data!} / Old : $version");
+                  // print("New : ${snapshot.data!} / Old : $version");
                   return ListTile(
                     leading: const Icon(CupertinoIcons.cloud_download),
                     title: snapshot.data!.compareTo(version) > 0
