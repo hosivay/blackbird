@@ -1,8 +1,8 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'package:blackbird/Screens/ChatList/ChatList.dart';
-import 'package:blackbird/Screens/ChatList/ChatList_Getx.dart';
-import 'package:blackbird/SettingsFiles/Update.dart';
-import 'package:blackbird/SettingsFiles/Version.dart'; 
+import 'package:blackbird/screens/chat_list_page/chat_list.dart';
+import 'package:blackbird/screens/chat_list_page/chat_list_getx.dart';
+import 'package:blackbird/settings_files/update.dart';
+import 'package:blackbird/settings_files/version.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,16 +15,16 @@ ThemeData lightTheme =
 ThemeData darkTheme =
     FlexThemeData.dark(scheme: FlexScheme.shark, useMaterial3: true);
 
-class desktopHome extends StatefulWidget {
-  const desktopHome({Key? key}) : super(key: key);
+class DesktopHomePage extends StatefulWidget {
+  const DesktopHomePage({Key? key}) : super(key: key);
 
   @override
-  State<desktopHome> createState() => _desktopHomeState();
+  State<DesktopHomePage> createState() => _DesktopHomePageState();
 }
 
-class _desktopHomeState extends State<desktopHome> {
+class _DesktopHomePageState extends State<DesktopHomePage> {
   final _controller = SideMenuController();
-late ChatListController chatListController;
+  late ChatListController chatListController;
 
   @override
   void initState() {
@@ -33,13 +33,10 @@ late ChatListController chatListController;
     super.initState();
   }
 
- 
- 
   @override
   Widget build(BuildContext context) {
-    
     return GetBuilder<ChatListController>(
-       builder: (controller) =>  Scaffold(
+      builder: (controller) => Scaffold(
         body: Row(
           children: [
             Stack(
@@ -71,7 +68,6 @@ late ChatListController chatListController;
                             ),
                             titleStyle: const TextStyle(color: Colors.white),
                             margin: const EdgeInsetsDirectional.all(15)),
-                      
                       ],
                       footer: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -83,8 +79,8 @@ late ChatListController chatListController;
                                   ? TextButton(
                                       child: Text(
                                         "New version released! ${snapshot.data!}",
-                                        style:
-                                            const TextStyle(color: Colors.white),
+                                        style: const TextStyle(
+                                            color: Colors.white),
                                       ),
                                       onPressed: () {
                                         launchURL();
@@ -93,13 +89,12 @@ late ChatListController chatListController;
                                   : TextButton(
                                       child: const Text(
                                         "Your version is up to date\nVersion : $version",
-                                        style:
-                                            TextStyle(color: Colors.white),
+                                        style: TextStyle(color: Colors.white),
                                       ),
                                       onPressed: () {
                                         launchURL(update: false);
                                       },
-                                    )  ;
+                                    );
                             } else if (snapshot.hasError) {
                               return const Text("");
                             } else {
@@ -134,7 +129,8 @@ late ChatListController chatListController;
                           child: Row(
                             children: [
                               Padding(
-                                padding: const EdgeInsets.fromLTRB(10, 6, 10, 6),
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 6, 10, 6),
                                 child: Icon(
                                   theme.brightness == Brightness.light
                                       ? Icons.brightness_3

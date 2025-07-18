@@ -1,6 +1,6 @@
 import 'package:animated_theme_switcher/animated_theme_switcher.dart';
-import 'package:blackbird/SettingsFiles/Update.dart';
-import 'package:blackbird/SettingsFiles/Version.dart'; 
+import 'package:blackbird/settings_files/Update.dart';
+import 'package:blackbird/settings_files/Version.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -50,8 +50,8 @@ Widget drawerChatList(BuildContext context, String localip) {
                 Navigator.pop(context);
               },
             ),
-             
-             FutureBuilder(
+
+            FutureBuilder(
               future: getLatestRelease(),
               builder: (context, AsyncSnapshot<String?> snapshot) {
                 if (snapshot.hasData) {
@@ -62,9 +62,9 @@ Widget drawerChatList(BuildContext context, String localip) {
                         ? Text("New version released! ${snapshot.data!}")
                         : const Text("Your version is up to date"),
                     onTap: () {
-                     if(snapshot.data!.compareTo(version) > 0){
-                      launchURL();
-                     }
+                      if (snapshot.data!.compareTo(version) > 0) {
+                        launchURL();
+                      }
                     },
                   );
                 } else if (snapshot.hasError) {

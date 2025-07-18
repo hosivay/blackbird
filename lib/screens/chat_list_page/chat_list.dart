@@ -1,6 +1,6 @@
-import 'package:blackbird/Screens/ChatList/ChatList_Getx.dart';
-import 'package:blackbird/Screens/ChatPage/chatpage.dart';
-import 'package:blackbird/SettingsFiles/Responsive.dart';
+import 'package:blackbird/screens/chat_list_page/chat_list_getx.dart';
+import 'package:blackbird/screens/chat_page_page/chatpage.dart';
+import 'package:blackbird/settings_files/responsive.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

@@ -1,5 +1,5 @@
-import 'package:blackbird/Screens/ChatPage/chatpage.dart';
-import 'package:blackbird/SettingsFiles/database.dart';
+import 'package:blackbird/screens/chat_page_page/chatpage.dart';
+import 'package:blackbird/settings_files/database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:network_info_plus/network_info_plus.dart';

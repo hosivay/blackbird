@@ -1,5 +1,5 @@
-import 'package:blackbird/Screens/ChatPage/ChatPage_Getx.dart';
-import 'package:blackbird/Screens/ChatPage/Widgets/Bubble.dart';
+import 'package:blackbird/screens/chat_page_page/chat_page_getx.dart';
+import 'package:blackbird/screens/chat_page_page/Widgets/Bubble.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
